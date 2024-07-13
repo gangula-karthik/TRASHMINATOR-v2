@@ -1,5 +1,25 @@
 "use client"
 import VideoStream from "@/components/VideoStream";
+import BarChartCard from "@/components/BarChart";
+import { ChartConfig } from "@/components/ui/chart";
+
+
+const chartData = [
+  { month: "January", desktop: 186 },
+  { month: "February", desktop: 305 },
+  { month: "March", desktop: 237 },
+  { month: "April", desktop: 73 },
+  { month: "May", desktop: 209 },
+  { month: "June", desktop: 214 },
+]
+
+const chartConfig = {
+  desktop: {
+    label: "Desktop",
+    color: "hsl(var(--chart-1))",
+  },
+} satisfies ChartConfig
+
 
 export default function IndexPage() {
   return (
@@ -9,7 +29,14 @@ export default function IndexPage() {
           Real-Time Trash Detection
         </h1>
       </div>
-      <VideoStream />
+      <div className="flex flex-row justify-between gap-2">
+        <div className="flex-1">
+          <VideoStream />
+        </div>
+        <div className="flex-1">
+          <BarChartCard chartData={chartData} chartConfig={chartConfig} />
+        </div>
+      </div>
     </section>
   )
 }
