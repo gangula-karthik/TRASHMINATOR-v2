@@ -1,9 +1,9 @@
 export type SiteConfig = typeof siteConfig
 
 export const siteConfig = {
-  name: "Next.js",
+  name: "Trashminator",
   description:
-    "Beautifully designed components built with Radix UI and Tailwind CSS.",
+    "Using AI to identify Trash",
   mainNav: [
     {
       title: "Home",
@@ -11,7 +11,7 @@ export const siteConfig = {
     },
   ],
   links: {
-    twitter: "https://twitter.com/shadcn",
+    twitter: "youtube.com",
     github: "https://github.com/shadcn/ui",
     docs: "https://ui.shadcn.com",
   },

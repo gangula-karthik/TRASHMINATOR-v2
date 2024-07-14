@@ -5,7 +5,7 @@ import * as tf from "@tensorflow/tfjs";
 import "@tensorflow/tfjs-backend-webgl";
 import { useEffect, useRef, useState } from "react";
 import { FaTimes } from "react-icons/fa";
-import {Button} from "@nextui-org/react";
+import { Button } from "@nextui-org/react";
 import { TiCameraOutline } from "react-icons/ti";
 import Image from 'next/image'
 
@@ -16,6 +16,7 @@ const VideoStream: React.FC = () => {
   const [aniId, setAniId] = useState<number | null>(null);
   const [modelName, setModelName] = useState(ZOO_MODEL[0]);
   const [loading, setLoading] = useState(0);
+  const [objectCounts, setObjectCounts] = useState<{ [key: string]: number }>({});
 
   const imageRef = useRef<HTMLImageElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -133,6 +134,53 @@ const VideoStream: React.FC = () => {
     // Convert Int32Array to Float32Array before passing to renderPrediction
     renderPrediction(new Float32Array(boxesData), new Float32Array(scoresData), new Float32Array(classesData));
 
+    // Initializing counts object to keep track of occurrences
+    const objectCounts: { [key: string]: number } = {};
+    const detectedLabels: string[] = [];  // List to keep track of detected labels
+
+    const detectObjects = () => {
+      const detectedObjects = [];
+      const currentTime = new Date().getTime();
+
+      for (let i = 0; i < scoresData.length; ++i) {
+        // 60% threshold
+        if (scoresData[i] > 0.6) {
+          const detectedObject = {
+            label: LABELS[classesData[i]],
+            score: (scoresData[i] * 100).toFixed(1),
+            timestamp: currentTime
+          };
+
+          // Append to detectedObjects for logging or other purposes
+          detectedObjects.push(detectedObject);
+
+          // Only append to detectedLabels if it's different from the last appended label
+          if (detectedLabels.length === 0 || detectedLabels[detectedLabels.length - 1] !== detectedObject.label) {
+            detectedLabels.push(detectedObject.label);
+
+            // Update the count for the detected object
+            if (objectCounts[detectedObject.label]) {
+              objectCounts[detectedObject.label]++;
+            } else {
+              objectCounts[detectedObject.label] = 1;
+            }
+          }
+        }
+      }
+
+      console.log('Detected Objects:', detectedObjects);
+      console.log('Object Counts:', objectCounts);
+      console.log('Detected Labels:', detectedLabels);
+    };
+
+    // Example of how to use the objectCounts to display counts
+    Object.keys(objectCounts).forEach((label) => {
+      console.log(`${label}: ${objectCounts[label]}`);
+    });
+
+    
+    detectObjects();
+
     tf.dispose(res);
 
     const reqId = requestAnimationFrame(doPredictFrame);
@@ -209,7 +257,7 @@ const VideoStream: React.FC = () => {
           maxWidth: "640px",
         }}
       >
-        <div style={{ marginBottom: "10px", width: "100%", maxWidth: "640px" }}>
+        <div style={{ marginBottom: "10px", width: "100%", maxWidth: "640px" }} className="rounded-lg">
           <UploadLayer display={!singleImage && !liveWebcam ? "flex" : "none"} />
           <div
             id="image-placeholder"
@@ -226,8 +274,8 @@ const VideoStream: React.FC = () => {
               style={{
                 width: "100%",
                 display: singleImage && !liveWebcam ? "block" : "none",
-                borderRadius: "20px"
               }}
+              className="rounded-lg"
               alt="Image Placeholder"
             />
             <video
@@ -235,16 +283,17 @@ const VideoStream: React.FC = () => {
               style={{
                 width: "100%",
                 display: liveWebcam && !singleImage ? "block" : "none",
-                borderRadius: "20px"
               }}
+              className="rounded-lg"
               autoPlay
               playsInline
               muted
             />
-            <canvas 
-              ref={canvasRef} 
-              width={640} 
-              height={640} 
+            <canvas
+              ref={canvasRef}
+              width={640}
+              height={640}
+              className="rounded-lg"
               style={{
                 position: "absolute",
                 top: 0,
@@ -252,7 +301,6 @@ const VideoStream: React.FC = () => {
                 width: "100%",
                 height: "100%",
                 pointerEvents: "none",
-                borderRadius: "20px"
               }}
             />
             <FaTimes
@@ -303,8 +351,14 @@ const VideoStream: React.FC = () => {
             color="success"
             variant="shadow"
           >
-          Start Webcam <TiCameraOutline size={20} />
+            Start Webcam <TiCameraOutline size={20} />
           </Button>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", marginTop: "20px" }}>
+          <h2>Object Counts</h2>
+          {Object.keys(objectCounts).map((label) => (
+            <div key={label}>{`${label}: ${objectCounts[label]}`}</div>
+          ))}
+        </div>
         </div>
       </div>
     </>
@@ -321,11 +375,11 @@ const UploadLayer: React.FC<UploadLayerProps> = ({ display }) => {
       style={{
         width: "100%",
         height: "320px",
-        backgroundImage: `url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='100%25' height='100%25' fill='none' stroke='%23E4E6ED' stroke-width='4' stroke-dasharray='4, 12' stroke-linecap='square'/%3E%3C/svg%3E")`,
         display: display,
         alignItems: "center",
         justifyContent: "center",
       }}
+      className="bg-card text-card-foreground rounded-lg border shadow-sm"
     >
       <svg
         focusable="false"
