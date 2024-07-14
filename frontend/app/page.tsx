@@ -2,6 +2,7 @@
 import VideoStream from "@/components/VideoStream";
 import BarChartCard from "@/components/BarChart";
 import { ChartConfig } from "@/components/ui/chart";
+import { PieChartCard } from "@/components/PieChart"
 
 
 const chartData = [
@@ -35,6 +36,9 @@ export default function IndexPage() {
         </div>
         <div className="flex-1">
           <BarChartCard chartData={chartData} chartConfig={chartConfig} />
+        </div>
+        <div className="flex-1">
+          <PieChartCard/>
         </div>
       </div>
     </section>
