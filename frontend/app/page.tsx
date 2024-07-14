@@ -30,7 +30,7 @@ export default function IndexPage() {
           Real-Time Trash Detection
         </h1>
       </div>
-      <div className="flex flex-row justify-between gap-2">
+      <div className="flex flex-col justify-between gap-2 md:flex-row">
         <div className="flex-1">
           <VideoStream />
         </div>
