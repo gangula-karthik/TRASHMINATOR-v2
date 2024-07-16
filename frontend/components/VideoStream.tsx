@@ -10,6 +10,7 @@ import { TiCameraOutline } from "react-icons/ti";
 import Image from 'next/image'
 
 const ZOO_MODEL = [{ name: "yolov5", child: ["yolov5n", "yolov5s"] }];
+// const ZOO_MODEL = [{ name: "yolov8", child: ["yolov8n_web_model"] }];
 
 const VideoStream: React.FC = () => {
   const [model, setModel] = useState<tf.GraphModel | null>(null);
@@ -28,6 +29,7 @@ const VideoStream: React.FC = () => {
 
   useEffect(() => {
     tf.loadGraphModel(`/model/${modelName.name}/${modelName.child[1]}/model.json`, {
+    // tf.loadGraphModel(`/model/yolov8n_web_model/model.json`, {
       onProgress: (fractions: number) => {
         setLoading(fractions);
       },
@@ -126,7 +128,7 @@ const VideoStream: React.FC = () => {
     });
 
     const res = await model.executeAsync(input) as [tf.Tensor, tf.Tensor, tf.Tensor];
-
+    console.log(res);
     const [boxes, scores, classes] = res;
     const boxesData = boxes.dataSync();
     const scoresData = scores.dataSync();
@@ -135,51 +137,51 @@ const VideoStream: React.FC = () => {
     renderPrediction(new Float32Array(boxesData), new Float32Array(scoresData), new Float32Array(classesData));
 
     // Initializing counts object to keep track of occurrences
-    const objectCounts: { [key: string]: number } = {};
-    const detectedLabels: string[] = [];  // List to keep track of detected labels
+    // const objectCounts: { [key: string]: number } = {};
+    // const detectedLabels: string[] = [];  // List to keep track of detected labels
 
-    const detectObjects = () => {
-      const detectedObjects = [];
-      const currentTime = new Date().getTime();
+    // const detectObjects = () => {
+    //   const detectedObjects = [];
+    //   const currentTime = new Date().getTime();
 
-      for (let i = 0; i < scoresData.length; ++i) {
-        // 60% threshold
-        if (scoresData[i] > 0.6) {
-          const detectedObject = {
-            label: LABELS[classesData[i]],
-            score: (scoresData[i] * 100).toFixed(1),
-            timestamp: currentTime
-          };
+    //   for (let i = 0; i < scoresData.length; ++i) {
+    //     // 60% threshold
+    //     if (scoresData[i] > 0.6) {
+    //       const detectedObject = {
+    //         label: LABELS[classesData[i]],
+    //         score: (scoresData[i] * 100).toFixed(1),
+    //         timestamp: currentTime
+    //       };
 
-          // Append to detectedObjects for logging or other purposes
-          detectedObjects.push(detectedObject);
+    //       // Append to detectedObjects for logging or other purposes
+    //       detectedObjects.push(detectedObject);
 
-          // Only append to detectedLabels if it's different from the last appended label
-          if (detectedLabels.length === 0 || detectedLabels[detectedLabels.length - 1] !== detectedObject.label) {
-            detectedLabels.push(detectedObject.label);
+    //       // Only append to detectedLabels if it's different from the last appended label
+    //       if (detectedLabels.length === 0 || detectedLabels[detectedLabels.length - 1] !== detectedObject.label) {
+    //         detectedLabels.push(detectedObject.label);
 
-            // Update the count for the detected object
-            if (objectCounts[detectedObject.label]) {
-              objectCounts[detectedObject.label]++;
-            } else {
-              objectCounts[detectedObject.label] = 1;
-            }
-          }
-        }
-      }
+    //         // Update the count for the detected object
+    //         if (objectCounts[detectedObject.label]) {
+    //           objectCounts[detectedObject.label]++;
+    //         } else {
+    //           objectCounts[detectedObject.label] = 1;
+    //         }
+    //       }
+    //     }
+    //   }
 
-      console.log('Detected Objects:', detectedObjects);
-      console.log('Object Counts:', objectCounts);
-      console.log('Detected Labels:', detectedLabels);
-    };
+    //   console.log('Detected Objects:', detectedObjects);
+    //   console.log('Object Counts:', objectCounts);
+    //   console.log('Detected Labels:', detectedLabels);
+    // };
 
-    // Example of how to use the objectCounts to display counts
-    Object.keys(objectCounts).forEach((label) => {
-      console.log(`${label}: ${objectCounts[label]}`);
-    });
+    // // Example of how to use the objectCounts to display counts
+    // Object.keys(objectCounts).forEach((label) => {
+    //   console.log(`${label}: ${objectCounts[label]}`);
+    // });
 
     
-    detectObjects();
+    // detectObjects();
 
     tf.dispose(res);
 
@@ -353,12 +355,12 @@ const VideoStream: React.FC = () => {
           >
             Start Webcam <TiCameraOutline size={20} />
           </Button>
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", marginTop: "20px" }}>
+        {/* <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", marginTop: "20px" }}>
           <h2>Object Counts</h2>
           {Object.keys(objectCounts).map((label) => (
             <div key={label}>{`${label}: ${objectCounts[label]}`}</div>
           ))}
-        </div>
+        </div> */}
         </div>
       </div>
     </>
