@@ -5,7 +5,7 @@ import * as tf from "@tensorflow/tfjs";
 import "@tensorflow/tfjs-backend-webgl";
 import { useEffect, useRef, useState } from "react";
 import { FaTimes } from "react-icons/fa";
-import { Button } from "@nextui-org/react";
+import { Button, Spinner } from "@nextui-org/react";
 import { TiCameraOutline } from "react-icons/ti";
 import Image from 'next/image'
 
@@ -246,7 +246,7 @@ const VideoStream: React.FC = () => {
           justifyContent: "center",
         }}
       >
-        {`Loading model... ${(loading * 100).toFixed(1)}%`}
+        <Spinner label={`Loading model... ${(loading * 100).toFixed(1)}%`} color="success" labelColor="success"/>
       </div>
 
       <div
