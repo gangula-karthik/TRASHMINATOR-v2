@@ -88,7 +88,7 @@ const VideoStream: React.FC = () => {
       return tf.image.resizeBilinear(frameTensor, [modelWidth, modelHeight]).div(255.0).expandDims(0);
     });
 
-    const res = await model.executeAsync(input);
+    const res = await model.executeAsync(input) as tf.Tensor[];
     const [boxes, scores, classes] = res;
     const boxesData = boxes.dataSync();
     const scoresData = scores.dataSync();
