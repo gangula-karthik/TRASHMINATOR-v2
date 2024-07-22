@@ -1,6 +1,37 @@
 import * as tf from "@tensorflow/tfjs";
 import LABELS from "datasets/coco/classes.json";
 
+export const preprocess = (
+    source: HTMLVideoElement | HTMLImageElement,
+    modelWidth: number,
+    modelHeight: number
+  ): [tf.Tensor, number, number] => {
+    let xRatio: number, yRatio: number; // ratios for boxes
+  
+    const input = tf.tidy(() => {
+      const img = tf.browser.fromPixels(source);
+  
+      // padding image to square => [n, m] to [n, n], n > m
+      const [h, w] = img.shape.slice(0, 2); // get source width and height
+      const maxSize = Math.max(w, h); // get max size
+      const imgPadded = img.pad([
+        [0, maxSize - h], // padding y [bottom only]
+        [0, maxSize - w], // padding x [right only]
+        [0, 0],
+      ]);
+  
+      xRatio = maxSize / w; // update xRatio
+      yRatio = maxSize / h; // update yRatio
+  
+      return tf.image
+        .resizeBilinear(imgPadded, [modelWidth, modelHeight]) // resize frame
+        .div(255.0) // normalize
+        .expandDims(0); // add batch
+    });
+  
+    return [input, xRatio, yRatio];
+  };
+
 export const renderPrediction = (ctx: CanvasRenderingContext2D, boxesData: Float32Array, scoresData: Float32Array, classesData: Float32Array) => {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     const font = "16px sans-serif";
@@ -32,34 +63,4 @@ export const renderPrediction = (ctx: CanvasRenderingContext2D, boxesData: Float
         ctx.fillStyle = "#FFFFFF";
         ctx.fillText(label, x1 + 2, y1 - (textHeight + 2));
     }
-};
-
-export const doPredictFrame = async (model: tf.GraphModel, videoRef: React.RefObject<HTMLVideoElement>, renderPrediction: (ctx: CanvasRenderingContext2D, boxesData: Float32Array, scoresData: Float32Array, classesData: Float32Array) => void, canvasRef: React.RefObject<HTMLCanvasElement>, setAniId: React.Dispatch<React.SetStateAction<number | null>>) => {
-    if (!model || !videoRef.current || !videoRef.current.srcObject) return;
-
-    tf.engine().startScope();
-
-    const [modelWidth, modelHeight] = model?.inputs[0]?.shape?.slice(1, 3) || [0, 0];
-
-    const input = tf.tidy(() => {
-        const frameTensor = tf.browser.fromPixels(videoRef.current!);
-        return tf.image.resizeBilinear(frameTensor, [modelWidth, modelHeight]).div(255.0).expandDims(0);
-    });
-
-    const res = await model.executeAsync(input) as tf.Tensor[];
-    const [boxes, scores, classes] = res;
-    const boxesData = boxes.dataSync();
-    const scoresData = scores.dataSync();
-    const classesData = classes.dataSync();
-    const ctx = canvasRef.current?.getContext("2d");
-    if (ctx) {
-        renderPrediction(ctx, new Float32Array(boxesData), new Float32Array(scoresData), new Float32Array(classesData));
-    }
-
-    tf.dispose(res);
-
-    const reqId = requestAnimationFrame(() => doPredictFrame(model, videoRef, renderPrediction, canvasRef, setAniId));
-    setAniId(reqId);
-
-    tf.engine().endScope();
 };
