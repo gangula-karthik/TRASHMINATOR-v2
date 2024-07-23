@@ -1,0 +1,72 @@
+description: Ultralytics best model trained on /content/TACO-YOLO-5/data.yaml
+author: Ultralytics
+date: '2024-07-23T14:20:13.266569'
+version: 8.2.2
+license: AGPL-3.0 License (https://ultralytics.com/license)
+docs: https://docs.ultralytics.com
+stride: 32
+task: detect
+batch: 1
+imgsz:
+- 640
+- 640
+names:
+  0: Aerosol
+  1: Aluminium blister pack
+  2: Aluminium foil
+  3: Battery
+  4: Broken glass
+  5: Carded blister pack
+  6: Cigarette
+  7: Clear plastic bottle
+  8: Corrugated carton
+  9: Crisp packet
+  10: Disposable food container
+  11: Disposable plastic cup
+  12: Drink can
+  13: Drink carton
+  14: Egg carton
+  15: Foam cup
+  16: Foam food container
+  17: Food Can
+  18: Food waste
+  19: Garbage bag
+  20: Glass bottle
+  21: Glass cup
+  22: Glass jar
+  23: Magazine paper
+  24: Meal carton
+  25: Metal bottle cap
+  26: Metal lid
+  27: Normal paper
+  28: Other carton
+  29: Other plastic
+  30: Other plastic bottle
+  31: Other plastic container
+  32: Other plastic cup
+  33: Other plastic wrapper
+  34: Paper bag
+  35: Paper cup
+  36: Paper straw
+  37: Pizza box
+  38: Plastic bottle cap
+  39: Plastic film
+  40: Plastic glooves
+  41: Plastic lid
+  42: Plastic straw
+  43: Plastic utensils
+  44: Polypropylene bag
+  45: Pop tab
+  46: Rope - strings
+  47: Scrap metal
+  48: Shoe
+  49: Single-use carrier bag
+  50: Six pack rings
+  51: Spread tub
+  52: Squeezable tube
+  53: Styrofoam piece
+  54: Tissues
+  55: Toilet tube
+  56: Tupperware
+  57: Unlabeled litter
+  58: Wrapping paper

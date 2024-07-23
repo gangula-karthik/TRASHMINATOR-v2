@@ -5,7 +5,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
@@ -53,14 +52,6 @@ const BarChartCard: React.FC<BarChartCardProps> = ({ chartData, chartConfig }) =
         </BarChart>
       </ChartContainer>
     </CardContent>
-    <CardFooter className="flex-col items-start gap-2 text-sm">
-      <div className="flex gap-2 font-medium leading-none">
-        Trending up by 5.2% this month <TrendingUp className="size-4" />
-      </div>
-      <div className="text-muted-foreground leading-none">
-        Showing total visitors for the last 6 months
-      </div>
-    </CardFooter>
   </Card>
   );
 };
