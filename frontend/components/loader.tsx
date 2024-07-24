@@ -1,10 +1,14 @@
 import "../style/loader.css";
 
-const Loader = (props) => {
+interface LoaderProps {
+  children: React.ReactNode;
+}
+
+const Loader: React.FC<LoaderProps> = ({ children, ...props }) => {
   return (
     <div className="wrapper" {...props}>
       <div className="spinner"></div>
-      <p>{props.children}</p>
+      <p>{children}</p>
     </div>
   );
 };

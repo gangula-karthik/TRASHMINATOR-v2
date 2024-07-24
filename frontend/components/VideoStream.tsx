@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { FaTimes } from "react-icons/fa";
 import { Button, Spinner } from "@nextui-org/react";
 import { TiCameraOutline } from "react-icons/ti";
-import { renderPrediction, doPredictFrame } from "../utils/predictionUtils"; // Import the utility functions
+import { renderPrediction } from "../utils/predictionUtils"; // Import the utility functions
 
 const ZOO_MODEL = [{ name: "yolov5", child: ["yolov5n", "yolov5s"] }];
 

@@ -4,9 +4,9 @@
 export class Webcam {
   /**
    * Open webcam and stream it through video tag.
-   * @param {HTMLVideoElement} videoRef video tag reference
+   * @param {any} videoRef video tag reference
    */
-  open = (videoRef) => {
+  open = (videoRef: HTMLVideoElement) => {
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       navigator.mediaDevices
         .getUserMedia({
@@ -23,11 +23,11 @@ export class Webcam {
 
   /**
    * Close opened webcam.
-   * @param {HTMLVideoElement} videoRef video tag reference
+   * @param {any} videoRef video tag reference
    */
-  close = (videoRef) => {
-    if (videoRef.srcObject) {
-      videoRef.srcObject.getTracks().forEach((track) => {
+  close = (videoRef: HTMLVideoElement) => {
+    if (videoRef.srcObject instanceof MediaStream) {
+      videoRef.srcObject.getTracks().forEach((track: MediaStreamTrack) => {
         track.stop();
       });
       videoRef.srcObject = null;

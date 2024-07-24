@@ -6,7 +6,7 @@ export const preprocess = (
     modelWidth: number,
     modelHeight: number
   ): [tf.Tensor, number, number] => {
-    let xRatio: number, yRatio: number; // ratios for boxes
+    let xRatio: number = 1, yRatio: number = 1; // initialize ratios
   
     const input = tf.tidy(() => {
       const img = tf.browser.fromPixels(source);
@@ -14,7 +14,7 @@ export const preprocess = (
       // padding image to square => [n, m] to [n, n], n > m
       const [h, w] = img.shape.slice(0, 2); // get source width and height
       const maxSize = Math.max(w, h); // get max size
-      const imgPadded = img.pad([
+      const imgPadded: any = img.pad([
         [0, maxSize - h], // padding y [bottom only]
         [0, maxSize - w], // padding x [right only]
         [0, 0],

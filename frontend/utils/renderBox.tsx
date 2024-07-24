@@ -8,7 +8,7 @@ import labels from "./labels.json";
  * @param {Array} classes_data class array
  * @param {Array[Number]} ratios boxes ratio [xRatio, yRatio]
  */
-export const renderBoxes = (canvasRef, boxes_data, scores_data, classes_data, ratios) => {
+export const renderBoxes = (canvasRef: any, boxes_data: any, scores_data: any, classes_data: any, ratios: any) => {
   const ctx = canvasRef.getContext("2d");
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // clean canvas
 
@@ -65,6 +65,9 @@ export const renderBoxes = (canvasRef, boxes_data, scores_data, classes_data, ra
 
 class Colors {
   // ultralytics color palette https://ultralytics.com/
+  private palette: string[];
+  private n: number;
+
   constructor() {
     this.palette = [
       "#FF3838",
@@ -91,9 +94,9 @@ class Colors {
     this.n = this.palette.length;
   }
 
-  get = (i) => this.palette[Math.floor(i) % this.n];
+  get = (i: any) => this.palette[Math.floor(i) % this.n];
 
-  static hexToRgba = (hex, alpha) => {
+  static hexToRgba = (hex: any, alpha: any) => {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result
       ? `rgba(${[parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)].join(

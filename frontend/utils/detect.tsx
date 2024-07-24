@@ -20,11 +20,11 @@ const preprocess = (source: HTMLVideoElement | HTMLImageElement, modelWidth: num
     // padding image to square => [n, m] to [n, n], n > m
     const [h, w] = img.shape.slice(0, 2); // get source width and height
     const maxSize = Math.max(w, h); // get max size
-    const imgPadded = img.pad([
+    const imgPadded: any = img.pad([
       [0, maxSize - h], // padding y [bottom only]
       [0, maxSize - w], // padding x [right only]
       [0, 0],
-    ]) as tf.Tensor3D; // give any type to imgPadded
+    ]); // give any type to imgPadded
 
     xRatio = maxSize / w; // update xRatio
     yRatio = maxSize / h; // update yRatio
@@ -49,7 +49,7 @@ const preprocess = (source: HTMLVideoElement | HTMLImageElement, modelWidth: num
  * @param {HTMLCanvasElement} canvasRef canvas reference
  * @param {VoidFunction} callback function to run after detection process
  */
-export const detect = async (source: HTMLImageElement | HTMLVideoElement, model: tf.GraphModel, canvasRef: HTMLCanvasElement, callback: VoidFunction = () => {}) => {
+export const detect = async (source: HTMLImageElement | HTMLVideoElement, model: any, canvasRef: HTMLCanvasElement, callback: VoidFunction = () => {}) => {
   const [modelWidth, modelHeight] = model.inputShape.slice(1, 3); // get model width and height
 
   tf.engine().startScope(); // start scoping tf engine
@@ -57,7 +57,7 @@ export const detect = async (source: HTMLImageElement | HTMLVideoElement, model:
 
   const res = model.net.execute(input); // inference model
   const transRes = res.transpose([0, 2, 1]); // transpose result [b, det, n] => [b, n, det]
-  const boxes = tf.tidy(() => {
+  const boxes: any = tf.tidy(() => {
     const w = transRes.slice([0, 0, 2], [-1, -1, 1]); // get width
     const h = transRes.slice([0, 0, 3], [-1, -1, 1]); // get height
     const x1 = tf.sub(transRes.slice([0, 0, 0], [-1, -1, 1]), tf.div(w, 2)); // x1
@@ -101,7 +101,7 @@ export const detect = async (source: HTMLImageElement | HTMLVideoElement, model:
  * @param {tf.GraphModel} model loaded YOLOv8 tensorflow.js model
  * @param {HTMLCanvasElement} canvasRef canvas reference
  */
-export const detectVideo = (vidSource: HTMLVideoElement, model: any, canvasRef: HTMLCanvasElement) => {
+export const detectVideo = (vidSource: HTMLVideoElement, model: any, canvasRef: any) => {
   /**
    * Function to detect every frame from video
    */
