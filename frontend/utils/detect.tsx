@@ -101,7 +101,7 @@ export const detect = async (source: HTMLImageElement | HTMLVideoElement, model:
  * @param {tf.GraphModel} model loaded YOLOv8 tensorflow.js model
  * @param {HTMLCanvasElement} canvasRef canvas reference
  */
-export const detectVideo = (vidSource: HTMLVideoElement, model: tf.GraphModel, canvasRef: HTMLCanvasElement) => {
+export const detectVideo = (vidSource: HTMLVideoElement, model: any, canvasRef: HTMLCanvasElement) => {
   /**
    * Function to detect every frame from video
    */
