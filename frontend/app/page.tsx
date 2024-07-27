@@ -1,9 +1,15 @@
 "use client"
-import VideoStream from "@/components/VideoStream";
-import BarChartCard from "@/components/BarChart";
-import { ChartConfig } from "@/components/ui/chart";
-import { PieChartCard } from "@/components/PieChart"
 
+import React, { useEffect, useRef, useState } from "react"
+import * as tf from "@tensorflow/tfjs"
+
+import "@tensorflow/tfjs-backend-webgl"
+import { ChartConfig } from "@/components/ui/chart"
+import BarChartCard from "@/components/BarChart"
+import { PieChartCard } from "@/components/PieChart"
+import ButtonHandler from "@/components/btn-handler"
+
+import { detectVideo } from "../utils/detect"
 
 const chartData = [
   { month: "January", desktop: 186 },
@@ -14,33 +20,76 @@ const chartData = [
   { month: "June", desktop: 214 },
 ]
 
-const chartConfig = {
-  desktop: {
-    label: "Desktop",
-    color: "hsl(var(--chart-1))",
-  },
-} satisfies ChartConfig
+const chartConfig: ChartConfig = {
+  desktop: { label: "Desktop", color: "hsl(var(--chart-1))" },
+}
 
+interface ModelState {
+  net: tf.GraphModel | null
+  inputShape: number[]
+}
 
-export default function IndexPage() {
+const App: React.FC = () => {
+  const [model, setModel] = useState<ModelState>({
+    net: null,
+    inputShape: [1, 640, 640, 3],
+  })
+
+  const cameraRef = useRef<HTMLVideoElement | null>(null)
+  const canvasRef = useRef<HTMLCanvasElement | null>(null)
+
+  useEffect(() => {
+    tf.ready().then(async () => {
+      const yolov8 = await tf.loadGraphModel(
+        "/model/yolov8n_web_model/model.json"
+      )
+      const dummyInput = tf.ones(yolov8.inputs[0].shape as number[])
+      const warmupResults = yolov8.execute(dummyInput)
+
+      setModel({
+        net: yolov8,
+        inputShape: yolov8.inputs[0].shape as number[],
+      })
+
+      tf.dispose([warmupResults, dummyInput])
+    })
+  }, [])
+
   return (
-    <section className="container grid items-center gap-6 pb-8 pt-6 md:py-10">
-      <div className="flex max-w-[980px] flex-col items-start gap-2">
-        <h1 className="text-3xl font-extrabold leading-tight tracking-tighter md:text-4xl">
-          Real-Time Trash Detection
-        </h1>
-      </div>
-      <div className="flex flex-col justify-between gap-2 md:flex-row">
-        <div className="flex-1">
-          <VideoStream />
+    <div className="App min-h-screen p-4">
+      <h1 className="mb-4 text-2xl font-extrabold leading-tight tracking-tighter md:text-3xl lg:text-4xl">
+        Real-Time Trash Detection
+      </h1>
+      <div className="flex flex-col gap-4 lg:grid lg:grid-cols-5">
+        <div className="relative aspect-video lg:col-span-3 lg:aspect-auto">
+          <div className="relative size-full">
+            <video
+              autoPlay
+              muted
+              ref={cameraRef}
+              onPlay={() =>
+                cameraRef.current &&
+                detectVideo(cameraRef.current, model, canvasRef.current)
+              }
+              className="absolute left-0 top-0 size-full rounded-lg object-cover"
+              playsInline
+            />
+            <canvas
+              ref={canvasRef}
+              className="pointer-events-none absolute left-0 top-0 size-full"
+            />
+          </div>
+          <div className="absolute bottom-4 left-4">
+            <ButtonHandler cameraRef={cameraRef} />
+          </div>
         </div>
-        <div className="flex-1">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:col-span-2 lg:grid-cols-1">
+          <PieChartCard />
           <BarChartCard chartData={chartData} chartConfig={chartConfig} />
         </div>
-        <div className="flex-1">
-          <PieChartCard/>
-        </div>
       </div>
-    </section>
+    </div>
   )
 }
+
+export default App

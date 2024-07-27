@@ -1,8 +1,9 @@
-import * as tf from "@tensorflow/tfjs";
-import { renderBoxes } from "./renderBox";
-import labels from "./labels.json";
+import * as tf from "@tensorflow/tfjs"
 
-const numClass = labels.length;
+import labels from "../datasets/taco/classes.json"
+import { renderBoxes } from "./renderBox"
+
+const numClass = labels.length
 
 /**
  * Preprocess image / frame before forwarded into the model
@@ -11,36 +12,40 @@ const numClass = labels.length;
  * @param {Number} modelHeight
  * @returns input tensor, xRatio and yRatio
  */
-const preprocess = (source: HTMLVideoElement | HTMLImageElement, modelWidth: number, modelHeight: number): [tf.Tensor3D, number, number] => {
-  let xRatio: number | undefined, yRatio: number | undefined; // ratios for boxes
+const preprocess = (
+  source: HTMLVideoElement | HTMLImageElement,
+  modelWidth: number,
+  modelHeight: number
+): [tf.Tensor3D, number, number] => {
+  let xRatio: number | undefined, yRatio: number | undefined // ratios for boxes
 
   const input = tf.tidy(() => {
-    const img = tf.browser.fromPixels(source);
+    const img = tf.browser.fromPixels(source)
 
     // padding image to square => [n, m] to [n, n], n > m
-    const [h, w] = img.shape.slice(0, 2); // get source width and height
-    const maxSize = Math.max(w, h); // get max size
+    const [h, w] = img.shape.slice(0, 2) // get source width and height
+    const maxSize = Math.max(w, h) // get max size
     const imgPadded: any = img.pad([
       [0, maxSize - h], // padding y [bottom only]
       [0, maxSize - w], // padding x [right only]
       [0, 0],
-    ]); // give any type to imgPadded
+    ]) // give any type to imgPadded
 
-    xRatio = maxSize / w; // update xRatio
-    yRatio = maxSize / h; // update yRatio
+    xRatio = maxSize / w // update xRatio
+    yRatio = maxSize / h // update yRatio
 
     return tf.image
       .resizeBilinear(imgPadded, [modelWidth, modelHeight]) // resize frame
       .div(255.0) // normalize
-      .expandDims(0) as tf.Tensor3D; // add batch and cast to Tensor3D
-  });
+      .expandDims(0) as tf.Tensor3D // add batch and cast to Tensor3D
+  })
 
   if (xRatio === undefined || yRatio === undefined) {
-    throw new Error('xRatio or yRatio is undefined');
+    throw new Error("xRatio or yRatio is undefined")
   }
 
-  return [input, xRatio, yRatio];
-};
+  return [input, xRatio, yRatio]
+}
 
 /**
  * Function run inference and do detection from source.
@@ -49,19 +54,24 @@ const preprocess = (source: HTMLVideoElement | HTMLImageElement, modelWidth: num
  * @param {HTMLCanvasElement} canvasRef canvas reference
  * @param {VoidFunction} callback function to run after detection process
  */
-export const detect = async (source: HTMLImageElement | HTMLVideoElement, model: any, canvasRef: HTMLCanvasElement, callback: VoidFunction = () => {}) => {
-  const [modelWidth, modelHeight] = model.inputShape.slice(1, 3); // get model width and height
+export const detect = async (
+  source: HTMLImageElement | HTMLVideoElement,
+  model: any,
+  canvasRef: HTMLCanvasElement,
+  callback: VoidFunction = () => {}
+) => {
+  const [modelWidth, modelHeight] = model.inputShape.slice(1, 3) // get model width and height
 
-  tf.engine().startScope(); // start scoping tf engine
-  const [input, xRatio, yRatio] = preprocess(source, modelWidth, modelHeight); // preprocess image
+  tf.engine().startScope() // start scoping tf engine
+  const [input, xRatio, yRatio] = preprocess(source, modelWidth, modelHeight) // preprocess image
 
-  const res = model.net.execute(input); // inference model
-  const transRes = res.transpose([0, 2, 1]); // transpose result [b, det, n] => [b, n, det]
+  const res = model.net.execute(input) // inference model
+  const transRes = res.transpose([0, 2, 1]) // transpose result [b, det, n] => [b, n, det]
   const boxes: any = tf.tidy(() => {
-    const w = transRes.slice([0, 0, 2], [-1, -1, 1]); // get width
-    const h = transRes.slice([0, 0, 3], [-1, -1, 1]); // get height
-    const x1 = tf.sub(transRes.slice([0, 0, 0], [-1, -1, 1]), tf.div(w, 2)); // x1
-    const y1 = tf.sub(transRes.slice([0, 0, 1], [-1, -1, 1]), tf.div(h, 2)); // y1
+    const w = transRes.slice([0, 0, 2], [-1, -1, 1]) // get width
+    const h = transRes.slice([0, 0, 3], [-1, -1, 1]) // get height
+    const x1 = tf.sub(transRes.slice([0, 0, 0], [-1, -1, 1]), tf.div(w, 2)) // x1
+    const y1 = tf.sub(transRes.slice([0, 0, 1], [-1, -1, 1]), tf.div(h, 2)) // y1
     return tf
       .concat(
         [
@@ -72,28 +82,41 @@ export const detect = async (source: HTMLImageElement | HTMLVideoElement, model:
         ],
         2
       )
-      .squeeze();
-  }); // process boxes [y1, x1, y2, x2]
+      .squeeze()
+  }) // process boxes [y1, x1, y2, x2]
 
   const [scores, classes] = tf.tidy(() => {
     // class scores
-    const rawScores = transRes.slice([0, 0, 4], [-1, -1, numClass]).squeeze(0); // #6 only squeeze axis 0 to handle only 1 class models
-    return [rawScores.max(1), rawScores.argMax(1)];
-  }); // get max scores and classes index
+    const rawScores = transRes.slice([0, 0, 4], [-1, -1, numClass]).squeeze(0) // #6 only squeeze axis 0 to handle only 1 class models
+    return [rawScores.max(1), rawScores.argMax(1)]
+  }) // get max scores and classes index
 
-  const nms = await tf.image.nonMaxSuppressionAsync(boxes, scores, 500, 0.45, 0.2); // NMS to filter boxes
+  const nms = await tf.image.nonMaxSuppressionAsync(
+    boxes,
+    scores,
+    500,
+    0.45,
+    0.2
+  ) // NMS to filter boxes
 
-  const boxes_data = boxes.gather(nms, 0).dataSync(); // indexing boxes by nms index
-  const scores_data = scores.gather(nms, 0).dataSync(); // indexing scores by nms index
-  const classes_data = classes.gather(nms, 0).dataSync(); // indexing classes by nms index
+  const boxes_data = boxes.gather(nms, 0).dataSync() // indexing boxes by nms index
+  const scores_data = scores.gather(nms, 0).dataSync() // indexing scores by nms index
+  const classes_data = classes.gather(nms, 0).dataSync() // indexing classes by nms index
 
-  renderBoxes(canvasRef, boxes_data, scores_data, classes_data, [xRatio, yRatio]); // render boxes
-  tf.dispose([res, transRes, boxes, scores, classes, nms]); // clear memory
+  console.log(classes_data)
+  console.log(scores_data)
+  console.log(boxes_data)
 
-  callback();
+  renderBoxes(canvasRef, boxes_data, scores_data, classes_data, [
+    xRatio,
+    yRatio,
+  ]) // render boxes
+  tf.dispose([res, transRes, boxes, scores, classes, nms]) // clear memory
 
-  tf.engine().endScope(); // end of scoping
-};
+  callback()
+
+  tf.engine().endScope() // end of scoping
+}
 
 /**
  * Function to detect video from every source.
@@ -101,21 +124,25 @@ export const detect = async (source: HTMLImageElement | HTMLVideoElement, model:
  * @param {tf.GraphModel} model loaded YOLOv8 tensorflow.js model
  * @param {HTMLCanvasElement} canvasRef canvas reference
  */
-export const detectVideo = (vidSource: HTMLVideoElement, model: any, canvasRef: any) => {
+export const detectVideo = (
+  vidSource: HTMLVideoElement,
+  model: any,
+  canvasRef: any
+) => {
   /**
    * Function to detect every frame from video
    */
   const detectFrame = async () => {
     if (vidSource.videoWidth === 0 && vidSource.srcObject === null) {
-      const ctx = canvasRef.getContext("2d");
-      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // clean canvas
-      return; // handle if source is closed
+      const ctx = canvasRef.getContext("2d")
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height) // clean canvas
+      return // handle if source is closed
     }
 
     detect(vidSource, model, canvasRef, () => {
-      requestAnimationFrame(detectFrame); // get another frame
-    });
-  };
+      requestAnimationFrame(detectFrame) // get another frame
+    })
+  }
 
-  detectFrame(); // initialize to detect every frame
-};
+  detectFrame() // initialize to detect every frame
+}
