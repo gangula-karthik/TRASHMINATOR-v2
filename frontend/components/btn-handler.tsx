@@ -1,5 +1,5 @@
 import React, { useState, useRef, RefObject } from "react";
-import { Webcam } from "../utils/webcam";
+import { Webcam } from "@/utils/webcam";
 import { Button } from "@nextui-org/react";
 
 interface ButtonHandlerProps {
@@ -26,7 +26,6 @@ const ButtonHandler: React.FC<ButtonHandlerProps> = ({ cameraRef }) => {
           else if (streaming === "camera") {
             if (cameraRef.current) {
               webcam.close(cameraRef.current);
-              cameraRef.current.style.display = "none";
               setStreaming(null);
             }
           }
