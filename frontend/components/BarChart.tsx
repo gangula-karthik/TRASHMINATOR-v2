@@ -30,8 +30,7 @@ const BarChartCard: React.FC<BarChartCardProps> = ({ chartData, chartConfig }) =
   return (
     <Card>
     <CardHeader>
-      <CardTitle>Bar Chart</CardTitle>
-      <CardDescription>January - June 2024</CardDescription>
+      <CardTitle>Items in Trash</CardTitle>
     </CardHeader>
     <CardContent>
       <ChartContainer config={chartConfig}>

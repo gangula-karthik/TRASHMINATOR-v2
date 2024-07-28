@@ -7,9 +7,7 @@ import "@tensorflow/tfjs-backend-webgl"
 import { ChartConfig } from "@/components/ui/chart"
 import BarChartCard from "@/components/BarChart"
 import { PieChartCard } from "@/components/PieChart"
-import ButtonHandler from "@/components/btn-handler"
-
-import { detectVideo } from "../utils/detect"
+import VideoStream from "@/components/VideoStream";
 
 const chartData = [
   { month: "January", desktop: 186 },
@@ -62,26 +60,7 @@ const App: React.FC = () => {
       </h1>
       <div className="flex flex-col gap-4 lg:grid lg:grid-cols-5">
         <div className="relative aspect-video lg:col-span-3 lg:aspect-auto">
-          <div className="relative size-full">
-            <video
-              autoPlay
-              muted
-              ref={cameraRef}
-              onPlay={() =>
-                cameraRef.current &&
-                detectVideo(cameraRef.current, model, canvasRef.current)
-              }
-              className="absolute left-0 top-0 size-full rounded-lg object-cover"
-              playsInline
-            />
-            <canvas
-              ref={canvasRef}
-              className="pointer-events-none absolute left-0 top-0 size-full"
-            />
-          </div>
-          <div className="absolute bottom-4 left-4">
-            <ButtonHandler cameraRef={cameraRef} />
-          </div>
+          <VideoStream />
         </div>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:col-span-2 lg:grid-cols-1">
           <PieChartCard />
