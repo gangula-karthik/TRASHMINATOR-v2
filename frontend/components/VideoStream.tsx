@@ -7,7 +7,6 @@ import "@tensorflow/tfjs-backend-webgl"
 import ButtonHandler from "@/components/btn-handler"
 
 import { detectVideo } from "@/utils/detect"
-import { ScanEye } from 'lucide-react';
 
 
 interface ModelState {
