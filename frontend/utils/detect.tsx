@@ -5,6 +5,30 @@ import { renderBoxes } from "./renderBox"
 
 const numClass = labels.length
 
+type ClassesData = Record<string, number>;
+type Labels = string[];
+
+interface MappedClassesData {
+  [key: string]: number;
+}
+
+const mapClassNumbersToNames = (
+  classes_data: ClassesData,
+  labels: Labels
+): MappedClassesData => {
+  const mappedClassesData: MappedClassesData = {};
+
+  // Iterate over the entries of classes_data
+  for (const [key, value] of Object.entries(classes_data)) {
+    const classNumber = value;
+    if (labels[classNumber]) {
+      mappedClassesData[labels[classNumber]] = value;
+    }
+  }
+
+  return mappedClassesData;
+};
+
 /**
  * Preprocess image / frame before forwarded into the model
  * @param {HTMLVideoElement|HTMLImageElement} source
@@ -103,9 +127,9 @@ export const detect = async (
   const scores_data = scores.gather(nms, 0).dataSync() // indexing scores by nms index
   const classes_data = classes.gather(nms, 0).dataSync() // indexing classes by nms index
 
-  console.log(classes_data)
-  console.log(scores_data)
-  console.log(boxes_data)
+  const mappedClassesData = mapClassNumbersToNames(classes_data, labels);
+  console.log("class + scores data:", JSON.stringify({ classes: mappedClassesData, scores: scores_data }, null, 2));
+
 
   renderBoxes(canvasRef, boxes_data, scores_data, classes_data, [
     xRatio,

@@ -54,7 +54,7 @@ const App: React.FC = () => {
   }, [])
 
   return (
-    <div className="App min-h-screen p-4">
+    <div className="App min-h-screen p-5">
       <h1 className="mb-4 text-2xl font-extrabold leading-tight tracking-tighter md:text-3xl lg:text-4xl">
         Real-Time Trash Detection
       </h1>
