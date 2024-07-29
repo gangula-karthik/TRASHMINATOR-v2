@@ -9,6 +9,18 @@ type ClassesData = Record<string, number>;
 type Labels = string[];
 
 interface MappedClassesData {
+  [key: number]: string;
+}
+
+interface CombinedData {
+  [key: string]: (string | number)[];
+}
+
+interface FilteredData {
+  [key: string]: (string | number)[];
+}
+
+interface Count {
   [key: string]: number;
 }
 
@@ -20,9 +32,8 @@ const mapClassNumbersToNames = (
 
   // Iterate over the entries of classes_data
   for (const [key, value] of Object.entries(classes_data)) {
-    const classNumber = value;
-    if (labels[classNumber]) {
-      mappedClassesData[labels[classNumber]] = value;
+    if (labels[value]) {
+      mappedClassesData[Number(key)] = labels[value];
     }
   }
 
@@ -82,7 +93,7 @@ export const detect = async (
   source: HTMLImageElement | HTMLVideoElement,
   model: any,
   canvasRef: HTMLCanvasElement,
-  callback: VoidFunction = () => {}
+  callback: VoidFunction = () => { }
 ) => {
   const [modelWidth, modelHeight] = model.inputShape.slice(1, 3) // get model width and height
 
@@ -127,8 +138,32 @@ export const detect = async (
   const scores_data = scores.gather(nms, 0).dataSync() // indexing scores by nms index
   const classes_data = classes.gather(nms, 0).dataSync() // indexing classes by nms index
 
+  // Mapping the data between classes and labels to see the name of the class
   const mappedClassesData = mapClassNumbersToNames(classes_data, labels);
-  console.log("class + scores data:", JSON.stringify({ classes: mappedClassesData, scores: scores_data }, null, 2));
+
+  // Combining and filtering the data
+  const combinedData: CombinedData = {};
+  const filteredData: FilteredData = {};
+  const count: Count = {};
+
+  for (const key in mappedClassesData) {
+    const className = mappedClassesData[key];
+    const score = scores_data[key];
+
+    if (score) {
+      combinedData[key] = [className, score];
+
+      if (score > 0.75) {
+        filteredData[key] = [className, score];
+        count[className] = (count[className] || 0) + 1;
+      }
+    } else {
+      combinedData[key] = [className];
+    }
+  }
+
+  console.log("Filtered data:", JSON.stringify(filteredData, null, 2));
+  console.log("Count of objects with score less than 60%:", JSON.stringify(count, null, 2));
 
 
   renderBoxes(canvasRef, boxes_data, scores_data, classes_data, [
