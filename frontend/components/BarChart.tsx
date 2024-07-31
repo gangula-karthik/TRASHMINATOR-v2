@@ -17,8 +17,8 @@ import {
 } from "@/components/ui/chart"
 
 interface ChartData {
-  month: string;
-  desktop: number;
+  object: string;
+  count: number;
 }
 
 interface BarChartCardProps {
@@ -37,17 +37,17 @@ const BarChartCard: React.FC<BarChartCardProps> = ({ chartData, chartConfig }) =
         <BarChart accessibilityLayer data={chartData}>
           <CartesianGrid vertical={false} />
           <XAxis
-            dataKey="month"
+            dataKey="object"
             tickLine={false}
             tickMargin={10}
             axisLine={false}
-            tickFormatter={(value) => value.slice(0, 3)}
+            tickFormatter={(value) => value.slice(0, 20)}
           />
           <ChartTooltip
             cursor={false}
             content={<ChartTooltipContent hideLabel />}
           />
-          <Bar dataKey="desktop" fill="var(--color-desktop)" radius={8} />
+          <Bar dataKey="count" fill="var(--color-count)" radius={8} />
         </BarChart>
       </ChartContainer>
     </CardContent>

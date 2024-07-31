@@ -6,25 +6,32 @@ import BarChartCard from "@/components/BarChart"
 import { PieChartCard } from "@/components/PieChart"
 import VideoStream from "@/components/VideoStream";
 
-const chartData = [
-  { month: "January", desktop: 186 },
-  { month: "February", desktop: 305 },
-  { month: "March", desktop: 237 },
-  { month: "April", desktop: 73 },
-  { month: "May", desktop: 209 },
-  { month: "June", desktop: 214 },
-]
-
 const chartConfig: ChartConfig = {
-  desktop: { label: "Desktop", color: "hsl(var(--chart-1))" },
+  count: { label: "Count", color: "hsl(var(--chart-1))" },
+}
+
+interface DetectionData {
+  filteredData: {
+    [key: string]: [string, number];
+  };
+  count: {
+    [key: string]: number;
+  };
 }
 
 const App: React.FC = () => {
-  const [detectionData, setDetectionData] = useState(null);
+  const [detectionData, setDetectionData] = useState<DetectionData | null>(null);
 
-  const handleDetectionData = (data: React.SetStateAction<null>) => {
+  const handleDetectionData = (data: DetectionData) => {
     setDetectionData(data);
   };
+
+  const chartData = detectionData ? Object.keys(detectionData.count).map((key) => ({
+    object: key,
+    count: detectionData.count[key]
+  })) : [];
+
+  console.log(chartData);
 
   return (
     <div className="App min-h-screen p-4 md:p-6 lg:p-8">
@@ -39,16 +46,16 @@ const App: React.FC = () => {
         </div>
         <div className="flex flex-col gap-6 lg:w-2/5 xl:w-1/3">
           <PieChartCard />
-          <BarChartCard chartData={chartData} chartConfig={chartConfig} />
+          <BarChartCard chartData={chartData.map(data => ({...data, object: data.object, count: data.count}))} chartConfig={chartConfig} />
         </div>
-        {detectionData && (
+        {/* {detectionData && (
         <div className="mt-4">
           <h2 className="text-xl font-bold">Detection Results from Page:</h2>
           <pre className="mt-2 max-h-60 overflow-auto rounded bg-gray-100 p-4">
             {JSON.stringify(detectionData, null, 2)}
           </pre>
         </div>
-      )}
+      )} */}
       </div>
     </div>
   )
