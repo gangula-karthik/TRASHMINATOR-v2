@@ -106,7 +106,7 @@ export const PieChartCard: React.FC = () => {
                           y={(viewBox.cy || 0) + 24}
                           className="fill-muted-foreground"
                         >
-                          Visitors
+                          % Recyclable
                         </tspan>
                       </text>
                     )
