@@ -1,5 +1,5 @@
 import { TrendingUp } from "lucide-react"
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
+import { Bar, BarChart, CartesianGrid, XAxis, LabelList } from "recharts"
 
 import {
   Card,
@@ -29,29 +29,39 @@ interface BarChartCardProps {
 const BarChartCard: React.FC<BarChartCardProps> = ({ chartData, chartConfig }) => {
   return (
     <Card>
-    <CardHeader>
-      <CardTitle>Items in Trash</CardTitle>
-    </CardHeader>
-    <CardContent>
-      <ChartContainer config={chartConfig}>
-        <BarChart accessibilityLayer data={chartData}>
-          <CartesianGrid vertical={false} />
-          <XAxis
-            dataKey="object"
-            tickLine={false}
-            tickMargin={10}
-            axisLine={false}
-            tickFormatter={(value) => value.slice(0, 20)}
-          />
-          <ChartTooltip
-            cursor={false}
-            content={<ChartTooltipContent hideLabel />}
-          />
-          <Bar dataKey="count" fill="var(--color-count)" radius={8} />
-        </BarChart>
-      </ChartContainer>
-    </CardContent>
-  </Card>
+      <CardHeader>
+        <CardTitle>Items in Trash</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <ChartContainer config={chartConfig}>
+          <BarChart accessibilityLayer data={chartData} margin={{
+            top: 25,
+          }}
+          >
+            <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="object"
+              tickLine={false}
+              tickMargin={10}
+              axisLine={false}
+              tickFormatter={(value) => value.slice(0, 20)}
+            />
+            <ChartTooltip
+              cursor={false}
+              content={<ChartTooltipContent hideLabel />}
+            />
+            <Bar dataKey="count" fill="var(--color-count)" radius={8}>
+              <LabelList
+                position="top"
+                offset={12}
+                className="fill-foreground"
+                fontSize={12}
+              />
+            </Bar>
+          </BarChart>
+        </ChartContainer>
+      </CardContent>
+    </Card>
   );
 };
 

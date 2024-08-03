@@ -187,7 +187,7 @@ const App: React.FC<{ onDetectionData: (data: any) => void }> = ({ onDetectionDa
   
 
   return (
-    <div className="App mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="App mx-auto max-w-6xl">
       {loading < 100 ? (
         <div className="flex h-64 items-center justify-center space-x-4">
           <Spinner color="success" />
