@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import { ChartConfig } from "@/components/ui/chart"
 import BarChartCard from "@/components/BarChart"
 import { PieChartCard } from "@/components/PieChart"
@@ -27,76 +27,73 @@ interface PersistDetectionData {
 }
 
 const App: React.FC = () => {
-  // State to hold the detection data
   const [detectionData, setDetectionData] = useState<DetectionData | null>(null);
-  // State to persist the detection data as an array
   const [persistDetectionData, setPersistDetectionData] = useState<PersistDetectionData[]>([]);
+  const lastUpdateTimeRef = useRef<{ [key: string]: number }>({});
+  const stableCountRef = useRef<{ [key: string]: number }>({});
 
   const handleDetectionData = (data: DetectionData) => {
+    console.log("Received detection data:", data);
     setDetectionData(data);
 
-    // Map the detection data to the format we want to persist
-    const newData = Object.keys(data.count).map((key) => ({
-      object: key,
-      count: data.count[key]
-    }));
+    const currentTime = Date.now();
+    const updateInterval = 1000; // Update interval in milliseconds
 
     setPersistDetectionData((prevData) => {
-      let hasChanges = false;
       let updatedData = [...prevData];
+      let hasChanges = false;
 
-      newData.forEach((newItem) => {
-        const prevItemIndex = updatedData.findIndex(item => item.object === newItem.object);
+      Object.entries(data.count).forEach(([object, count]) => {
+        console.log(`Processing object: ${object}, count: ${count}`);
+        const lastUpdateTime = lastUpdateTimeRef.current[object] || 0;
+        const stableCount = stableCountRef.current[object] || 0;
 
-        if (prevItemIndex !== -1) {
-          // Item exists in previous data
-          const prevItem = updatedData[prevItemIndex];
+        console.log(`Last update time: ${lastUpdateTime}, Current time: ${currentTime}`);
+        console.log(`Time difference: ${currentTime - lastUpdateTime}`);
+        console.log(`Stable count: ${stableCount}, New count: ${count}`);
+        console.log(`Count difference: ${Math.abs(count - stableCount)}`);
 
-          if (prevItemIndex === updatedData.length - 1) {
-            // It's the last item, apply max rule
-            if (newItem.count > prevItem.count) {
-              hasChanges = true;
-              updatedData[prevItemIndex] = { ...prevItem, count: newItem.count };
+        if (currentTime - lastUpdateTime > updateInterval) {
+          console.log(`Time interval check passed for ${object}`);
+          // Check if count has changed significantly
+          if (Math.abs(count - stableCount) > 1) {
+            console.log(`Significant change detected for ${object}`);
+            const existingIndex = updatedData.findIndex((item) => item.object === object);
+            if (existingIndex !== -1) {
+              console.log(`Updating existing entry for ${object}`);
+              updatedData[existingIndex] = { object, count };
+            } else {
+              console.log(`Adding new entry for ${object}`);
+              updatedData.push({ object, count });
             }
-          } else {
-            // Not the last item, add counts
             hasChanges = true;
-            updatedData[prevItemIndex] = { ...prevItem, count: prevItem.count + newItem.count };
+            lastUpdateTimeRef.current[object] = currentTime;
+            stableCountRef.current[object] = count;
+          } else {
+            console.log(`No significant change for ${object}`);
           }
         } else {
-          // New item
-          hasChanges = true;
-          updatedData.push(newItem);
+          console.log(`Time interval check failed for ${object}`);
         }
       });
 
-      // Handle empty object case
-      if (updatedData.length >= 2) {
-        const lastItem = updatedData[updatedData.length - 1];
-        const secondLastItem = updatedData[updatedData.length - 2];
-
-        if (lastItem.object === '' && secondLastItem.object !== '') {
-          hasChanges = true;
-          updatedData[updatedData.length - 2] = {
-            ...secondLastItem,
-            count: secondLastItem.count + lastItem.count
-          };
-          updatedData.pop(); // Remove the last item (empty object)
-        }
+      // Remove objects that are no longer detected
+      const beforeFilterLength = updatedData.length;
+      updatedData = updatedData.filter((item) => item.object in data.count);
+      if (updatedData.length !== beforeFilterLength) {
+        console.log(`Removed ${beforeFilterLength - updatedData.length} objects`);
+        hasChanges = true;
       }
 
-      // If there are no changes, return the previous data (no update)
-      if (!hasChanges) {
-        return prevData;
-      }
+      console.log("Updated data:", updatedData);
+      console.log("Has changes:", hasChanges);
 
-      // Return the updated data
-      return updatedData;
+      return hasChanges ? updatedData : prevData;
     });
   };
 
   useEffect(() => {
-    console.log(persistDetectionData);
+    console.log("persistDetectionData updated:", persistDetectionData);
   }, [persistDetectionData]);
 
 

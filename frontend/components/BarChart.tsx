@@ -44,7 +44,7 @@ const BarChartCard: React.FC<BarChartCardProps> = ({ chartData, chartConfig }) =
               tickLine={false}
               tickMargin={10}
               axisLine={false}
-              tickFormatter={(value) => value.slice(0, 20)}
+              tickFormatter={(value) => value.slice(0, 15)}
             />
             <ChartTooltip
               cursor={false}

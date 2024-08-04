@@ -32,7 +32,7 @@ const ButtonHandler: React.FC<ButtonHandlerProps> = ({ cameraRef }) => {
         }}
         color="success"
         variant="shadow"
-        fullWidth
+        fullWidth={true}
       >
         {streaming === "camera" ? "Close" : "Open"} Webcam
       </Button>
