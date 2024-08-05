@@ -109,25 +109,23 @@ const detect = async (
   const scores_data = scores.gather(nms, 0).dataSync()
   const classes_data = classes.gather(nms, 0).dataSync()
 
-  const mappedClassesData = mapClassNumbersToNames(classes_data, labels)
+  tf.dispose([res, transRes, boxes, scores, classes, nms])
 
   const filteredData: FilteredData = {}
   const count: Count = {}
 
-  for (const key in mappedClassesData) {
-    const className = mappedClassesData[key]
-    const score = scores_data[key]
+  for (let i = 0; i < scores_data.length; i++) {
+    const score = scores_data[i]
+    const className = labels[classes_data[i]]
 
-    if (score && score > 0.75) {
-      filteredData[key] = [className, score]
+    if (score > 0.75) {
+      filteredData[i] = [className, score]
       count[className] = (count[className] || 0) + 1
     }
   }
 
-  // Assuming renderBoxes is imported or defined elsewhere
   renderBoxes(canvasRef, boxes_data, scores_data, classes_data, [xRatio, yRatio])
 
-  tf.dispose([res, transRes, boxes, scores, classes, nms])
   tf.engine().endScope()
 
   return { filteredData, count }

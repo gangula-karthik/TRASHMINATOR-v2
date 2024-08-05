@@ -7,7 +7,6 @@ import { PieChartCard } from "@/components/PieChart"
 import VideoStream from "@/components/VideoStream";
 import {Button} from "@nextui-org/react";
 
-
 const chartConfig: ChartConfig = {
   count: { label: "Count", color: "hsl(var(--chart-1))" },
 }
@@ -29,73 +28,51 @@ interface PersistDetectionData {
 const App: React.FC = () => {
   const [detectionData, setDetectionData] = useState<DetectionData | null>(null);
   const [persistDetectionData, setPersistDetectionData] = useState<PersistDetectionData[]>([]);
-  const lastUpdateTimeRef = useRef<{ [key: string]: number }>({});
-  const stableCountRef = useRef<{ [key: string]: number }>({});
+  const lastDetectionTimeRef = useRef<{[key: string]: number}>({});
 
   const handleDetectionData = (data: DetectionData) => {
-    console.log("Received detection data:", data);
     setDetectionData(data);
 
     const currentTime = Date.now();
-    const updateInterval = 1000; // Update interval in milliseconds
+    const newData = Object.keys(data.count).filter(key => {
+      const lastTime = lastDetectionTimeRef.current[key] || 0;
+      if (currentTime - lastTime > 5000) {
+        lastDetectionTimeRef.current[key] = currentTime;
+        return true;
+      }
+      return false;
+    }).map((key) => ({
+      object: key,
+      count: 1  // Always count as 1 when detected
+    }));
 
     setPersistDetectionData((prevData) => {
+      if (newData.length === 0) return prevData;  // No changes if no new detections
+
       let updatedData = [...prevData];
-      let hasChanges = false;
 
-      Object.entries(data.count).forEach(([object, count]) => {
-        console.log(`Processing object: ${object}, count: ${count}`);
-        const lastUpdateTime = lastUpdateTimeRef.current[object] || 0;
-        const stableCount = stableCountRef.current[object] || 0;
+      newData.forEach((newItem) => {
+        const prevItemIndex = updatedData.findIndex(item => item.object === newItem.object);
 
-        console.log(`Last update time: ${lastUpdateTime}, Current time: ${currentTime}`);
-        console.log(`Time difference: ${currentTime - lastUpdateTime}`);
-        console.log(`Stable count: ${stableCount}, New count: ${count}`);
-        console.log(`Count difference: ${Math.abs(count - stableCount)}`);
-
-        if (currentTime - lastUpdateTime > updateInterval) {
-          console.log(`Time interval check passed for ${object}`);
-          // Check if count has changed significantly
-          if (Math.abs(count - stableCount) > 1) {
-            console.log(`Significant change detected for ${object}`);
-            const existingIndex = updatedData.findIndex((item) => item.object === object);
-            if (existingIndex !== -1) {
-              console.log(`Updating existing entry for ${object}`);
-              updatedData[existingIndex] = { object, count };
-            } else {
-              console.log(`Adding new entry for ${object}`);
-              updatedData.push({ object, count });
-            }
-            hasChanges = true;
-            lastUpdateTimeRef.current[object] = currentTime;
-            stableCountRef.current[object] = count;
-          } else {
-            console.log(`No significant change for ${object}`);
-          }
+        if (prevItemIndex !== -1) {
+          // Item exists, increment count
+          updatedData[prevItemIndex] = {
+            ...updatedData[prevItemIndex],
+            count: updatedData[prevItemIndex].count + 1
+          };
         } else {
-          console.log(`Time interval check failed for ${object}`);
+          // New item, add to list
+          updatedData.push(newItem);
         }
       });
 
-      // Remove objects that are no longer detected
-      const beforeFilterLength = updatedData.length;
-      updatedData = updatedData.filter((item) => item.object in data.count);
-      if (updatedData.length !== beforeFilterLength) {
-        console.log(`Removed ${beforeFilterLength - updatedData.length} objects`);
-        hasChanges = true;
-      }
-
-      console.log("Updated data:", updatedData);
-      console.log("Has changes:", hasChanges);
-
-      return hasChanges ? updatedData : prevData;
+      return updatedData;
     });
   };
 
   useEffect(() => {
-    console.log("persistDetectionData updated:", persistDetectionData);
+    console.log(persistDetectionData);
   }, [persistDetectionData]);
-
 
   return (
     <div className="App min-h-screen p-4 md:p-6 lg:p-8">
@@ -113,16 +90,8 @@ const App: React.FC = () => {
         </div>
         <div className="flex flex-col gap-6 lg:w-2/5 xl:w-1/3">
           <PieChartCard />
-          <BarChartCard chartData={persistDetectionData.map(data => ({ ...data, object: data.object, count: data.count }))} chartConfig={chartConfig} />
+          <BarChartCard chartData={persistDetectionData} chartConfig={chartConfig} />
         </div>
-        {/* {detectionData && (
-        <div className="mt-4">
-          <h2 className="text-xl font-bold">Detection Results from Page:</h2>
-          <pre className="mt-2 max-h-60 overflow-auto rounded bg-gray-100 p-you4">
-            {JSON.stringify(detectionData, null, 2)}
-          </pre>
-        </div>
-      )} */}
       </div>
     </div>
   )
