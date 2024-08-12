@@ -18,49 +18,34 @@ import {
 } from "@/components/ui/chart"
 
 interface ChartData {
-  browser: string;
-  visitors: number;
+  item: string;
+  percentage: number;
   fill: string;
 }
 
-const chartData: ChartData[] = [
-  { browser: "chrome", visitors: 275, fill: "var(--color-chrome)" },
-  { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
-  { browser: "firefox", visitors: 287, fill: "var(--color-firefox)" },
-  { browser: "edge", visitors: 173, fill: "var(--color-edge)" },
-  { browser: "other", visitors: 190, fill: "var(--color-other)" },
-]
+// const chartData: ChartData[] = [
+//   { item: "Recyclable", percentage: 70, fill: "var(--color-recyclable)" },
+//   { item: "Non-Recyclable", percentage: 30, fill: "var(--color-nonRecyclable)" },
+// ]
 
 const chartConfig = {
-    visitors: {
-      label: "Visitors",
+    percentage: {
+      label: "Percentage",
     },
-    chrome: {
-      label: "Chrome",
-      color: "hsl(var(--chart-1))",
-    },
-    safari: {
-      label: "Safari",
-      color: "hsl(var(--chart-2))",
-    },
-    firefox: {
-      label: "Firefox",
+    recyclable: {
+      label: "Recyclable",
       color: "hsl(var(--chart-3))",
     },
-    edge: {
-      label: "Edge",
-      color: "hsl(var(--chart-4))",
-    },
-    other: {
-      label: "Other",
-      color: "hsl(var(--chart-5))",
-    },
+    nonRecyclable: {
+      label: "Non-Recyclable",
+      color: "hsl(var(--chart-1))",
+    }
   } satisfies ChartConfig
 
-export const PieChartCard: React.FC = () => {
-  const totalVisitors = React.useMemo(() => {
-    return chartData.reduce((acc, curr) => acc + curr.visitors, 0)
-  }, [])
+export const PieChartCard: React.FC<{ chartData: ChartData[] }> = ({ chartData }) => {
+  const totalPercentage = React.useMemo(() => {
+    return chartData.reduce((acc: number, curr: ChartData) => acc + curr.percentage, 0)
+  }, [chartData])
 
   return (
     <Card className="flex flex-col">
@@ -79,8 +64,8 @@ export const PieChartCard: React.FC = () => {
             />
             <Pie
               data={chartData}
-              dataKey="visitors"
-              nameKey="browser"
+              dataKey="percentage"
+              nameKey="item"
               innerRadius={60}
               strokeWidth={5}
             >
@@ -99,7 +84,7 @@ export const PieChartCard: React.FC = () => {
                           y={viewBox.cy}
                           className="fill-foreground text-3xl font-bold"
                         >
-                          {totalVisitors.toLocaleString()}
+                          {totalPercentage.toLocaleString()}
                         </tspan>
                         <tspan
                           x={viewBox.cx}

@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect, useRef } from "react"
+import React, { useState, useEffect, useRef, useMemo } from "react"
 import { ChartConfig } from "@/components/ui/chart"
 import BarChartCard from "@/components/BarChart"
 import { PieChartCard } from "@/components/PieChart"
@@ -24,6 +24,21 @@ interface PersistDetectionData {
   object: string;
   count: number;
 }
+
+interface ChartData {
+  item: string;
+  percentage: number;
+  fill: string;
+}
+
+const recyclableItems = [
+  "Aluminium blister pack", "Aluminium foil", "Battery", "Clear plastic bottle", 
+  "Corrugated carton", "Drink can", "Drink carton", "Egg carton", "Food Can", 
+  "Glass bottle", "Glass jar", "Magazine paper", "Meal carton", "Metal bottle cap", 
+  "Metal lid", "Normal paper", "Other carton", "Other plastic bottle", 
+  "Paper bag", "Pizza box", "Plastic bottle cap", "Plastic lid", "Pop tab", 
+  "Scrap metal", "Spread tub", "Toilet tube", "Tupperware"
+];
 
 const App: React.FC = () => {
   const [detectionData, setDetectionData] = useState<DetectionData | null>(null);
@@ -70,9 +85,32 @@ const App: React.FC = () => {
     });
   };
 
+  const chartData: ChartData[] = useMemo(() => {
+    if (persistDetectionData.length === 0) {
+      return [
+        { item: "Recyclable", percentage: 0, fill: "var(--color-recyclable)" },
+        { item: "Non-Recyclable", percentage: 0, fill: "var(--color-nonRecyclable)" }
+      ];
+    }
+
+    const totalItems = persistDetectionData.reduce((sum, item) => sum + item.count, 0);
+    const recyclableCount = persistDetectionData.reduce((sum, item) => 
+      recyclableItems.includes(item.object) ? sum + item.count : sum, 0);
+    const nonRecyclableCount = totalItems - recyclableCount;
+
+    const recyclablePercentage = (recyclableCount / totalItems) * 100;
+    const nonRecyclablePercentage = (nonRecyclableCount / totalItems) * 100;
+
+    return [
+      { item: "Recyclable:  ", percentage: recyclablePercentage, fill: "var(--color-recyclable)" },
+      { item: "Non-Recyclable:  ", percentage: nonRecyclablePercentage, fill: "var(--color-nonRecyclable)" }
+    ];
+  }, [persistDetectionData]);
+
   useEffect(() => {
     console.log(persistDetectionData);
-  }, [persistDetectionData]);
+    console.log(chartData);
+  }, [persistDetectionData, chartData]);
 
   return (
     <div className="App min-h-screen p-4 md:p-6 lg:p-8">
@@ -89,7 +127,7 @@ const App: React.FC = () => {
           </div>
         </div>
         <div className="flex flex-col gap-6 lg:w-2/5 xl:w-1/3">
-          <PieChartCard />
+          <PieChartCard chartData={chartData} />
           <BarChartCard chartData={persistDetectionData} chartConfig={chartConfig} />
         </div>
       </div>
