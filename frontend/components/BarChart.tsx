@@ -1,16 +1,13 @@
-import { TrendingUp } from "lucide-react"
 import { Bar, BarChart, CartesianGrid, XAxis, LabelList } from "recharts"
 
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
 
 import {
-  ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,

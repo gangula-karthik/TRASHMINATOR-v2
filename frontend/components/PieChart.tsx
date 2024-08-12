@@ -1,12 +1,9 @@
 import * as React from "react"
-import { TrendingUp } from "lucide-react"
 import { Label, Pie, PieChart } from "recharts"
 
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
@@ -22,11 +19,6 @@ interface ChartData {
   percentage: number;
   fill: string;
 }
-
-// const chartData: ChartData[] = [
-//   { item: "Recyclable", percentage: 70, fill: "var(--color-recyclable)" },
-//   { item: "Non-Recyclable", percentage: 30, fill: "var(--color-nonRecyclable)" },
-// ]
 
 const chartConfig = {
     percentage: {
