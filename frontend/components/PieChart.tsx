@@ -35,9 +35,11 @@ const chartConfig = {
   } satisfies ChartConfig
 
 export const PieChartCard: React.FC<{ chartData: ChartData[] }> = ({ chartData }) => {
-  const totalPercentage = React.useMemo(() => {
-    return chartData.reduce((acc: number, curr: ChartData) => acc + curr.percentage, 0)
+  const recyclablePercentage = React.useMemo(() => {
+    return chartData.find(data => data.item === "Recyclable:  ")?.percentage || 0;
   }, [chartData])
+
+  console.log(chartData)
 
   return (
     <Card className="flex flex-col">
@@ -76,7 +78,7 @@ export const PieChartCard: React.FC<{ chartData: ChartData[] }> = ({ chartData }
                           y={viewBox.cy}
                           className="fill-foreground text-3xl font-bold"
                         >
-                          {totalPercentage.toLocaleString()}
+                          {recyclablePercentage.toLocaleString()}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
