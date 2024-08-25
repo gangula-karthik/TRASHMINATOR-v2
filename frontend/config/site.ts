@@ -11,8 +11,7 @@ export const siteConfig = {
     },
   ],
   links: {
-    twitter: "youtube.com",
-    github: "https://github.com/shadcn/ui",
+    github: "https://github.com/gangula-karthik/TRASHMINATOR-v2",
     docs: "https://ui.shadcn.com",
   },
 }
