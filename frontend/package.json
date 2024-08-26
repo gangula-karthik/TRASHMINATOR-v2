@@ -23,7 +23,7 @@
     "@radix-ui/react-slot": "^1.0.2",
     "@tensorflow-models/coco-ssd": "^2.2.3",
     "@tensorflow/tfjs": "^4.20.0",
-    "axios": "^1.7.2",
+    "axios": "^1.7.4",
     "class-variance-authority": "^0.4.0",
     "clsx": "^1.2.1",
     "framer-motion": "^11.3.2",
