@@ -39,8 +39,6 @@ export const PieChartCard: React.FC<{ chartData: ChartData[] }> = ({ chartData }
     return chartData.find(data => data.item === "Recyclable:  ")?.percentage || 0;
   }, [chartData])
 
-  console.log(chartData)
-
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0">

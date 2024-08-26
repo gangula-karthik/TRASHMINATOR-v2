@@ -6,10 +6,13 @@ import BarChartCard from "@/components/BarChart"
 import { PieChartCard } from "@/components/PieChart"
 import VideoStream from "@/components/VideoStream";
 import {Button} from "@nextui-org/react";
+import { Toaster } from "@/components/ui/sonner"
+import { toast } from "sonner"
+
 
 const chartConfig: ChartConfig = {
   count: { label: "Count", color: "hsl(var(--chart-1))" },
-}
+};
 
 interface DetectionData {
   filteredData: {
@@ -32,70 +35,100 @@ interface ChartData {
 }
 
 const recyclableItems = [
-  "Aluminium blister pack", "Aluminium foil", "Battery", "Clear plastic bottle", 
-  "Corrugated carton", "Drink can", "Drink carton", "Egg carton", "Food Can", 
-  "Glass bottle", "Glass jar", "Magazine paper", "Meal carton", "Metal bottle cap", 
-  "Metal lid", "Normal paper", "Other carton", "Other plastic bottle", 
-  "Paper bag", "Pizza box", "Plastic bottle cap", "Plastic lid", "Pop tab", 
-  "Scrap metal", "Spread tub", "Toilet tube", "Tupperware"
+  "Aluminium blister pack",
+  "Aluminium foil",
+  "Battery",
+  "Clear plastic bottle",
+  "Corrugated carton",
+  "Drink can",
+  "Drink carton",
+  "Egg carton",
+  "Food Can",
+  "Glass bottle",
+  "Glass jar",
+  "Magazine paper",
+  "Meal carton",
+  "Metal bottle cap",
+  "Metal lid",
+  "Normal paper",
+  "Other carton",
+  "Other plastic bottle",
+  "Paper bag",
+  "Pizza box",
+  "Plastic bottle cap",
+  "Plastic lid",
+  "Pop tab",
+  "Scrap metal",
+  "Spread tub",
+  "Toilet tube",
+  "Tupperware",
 ];
 
 const App: React.FC = () => {
   const [detectionData, setDetectionData] = useState<DetectionData | null>(null);
   const [persistDetectionData, setPersistDetectionData] = useState<PersistDetectionData[]>([]);
-  const lastDetectionTimeRef = useRef<{[key: string]: number}>({});
+  const lastDetectionTimeRef = useRef<{ [key: string]: number }>({});
 
   const handleDetectionData = (data: DetectionData) => {
     setDetectionData(data);
-
+  
     const currentTime = Date.now();
-    const newData = Object.keys(data.count).filter(key => {
-      const lastTime = lastDetectionTimeRef.current[key] || 0;
-      if (currentTime - lastTime > 5000) {
-        lastDetectionTimeRef.current[key] = currentTime;
-        return true;
-      }
-      return false;
-    }).map((key) => ({
-      object: key,
-      count: 1  // Always count as 1 when detected
-    }));
-
+    const newData = Object.keys(data.count)
+      .filter((key) => {
+        const lastTime = lastDetectionTimeRef.current[key] || 0;
+        if (currentTime - lastTime > 5000) {
+          lastDetectionTimeRef.current[key] = currentTime;
+          return true;
+        }
+        return false;
+      })
+      .map((key) => ({
+        object: key,
+        count: 1, // Always count as 1 when detected
+      }));
+  
     setPersistDetectionData((prevData) => {
-      if (newData.length === 0) return prevData;  // No changes if no new detections
-
+      if (newData.length === 0) return prevData; // No changes if no new detections
+  
       let updatedData = [...prevData];
-
+  
       newData.forEach((newItem) => {
-        const prevItemIndex = updatedData.findIndex(item => item.object === newItem.object);
-
+        const prevItemIndex = updatedData.findIndex((item) => item.object === newItem.object);
+  
         if (prevItemIndex !== -1) {
           // Item exists, increment count
           updatedData[prevItemIndex] = {
             ...updatedData[prevItemIndex],
-            count: updatedData[prevItemIndex].count + 1
+            count: updatedData[prevItemIndex].count + 1,
           };
         } else {
           // New item, add to list
           updatedData.push(newItem);
         }
       });
-
+  
       return updatedData;
     });
+  
+    // Show toast for each new detection
+    newData.forEach((newItem) => {
+      toast.success(`${newItem.object} has been detected.`); // Updated toast call to use a string
+    });
   };
-
+  
   const chartData: ChartData[] = useMemo(() => {
     if (persistDetectionData.length === 0) {
       return [
         { item: "Recyclable", percentage: 0, fill: "var(--color-recyclable)" },
-        { item: "Non-Recyclable", percentage: 0, fill: "var(--color-nonRecyclable)" }
+        { item: "Non-Recyclable", percentage: 0, fill: "var(--color-nonRecyclable)" },
       ];
     }
 
     const totalItems = persistDetectionData.reduce((sum, item) => sum + item.count, 0);
-    const recyclableCount = persistDetectionData.reduce((sum, item) => 
-      recyclableItems.includes(item.object) ? sum + item.count : sum, 0);
+    const recyclableCount = persistDetectionData.reduce(
+      (sum, item) => (recyclableItems.includes(item.object) ? sum + item.count : sum),
+      0
+    );
     const nonRecyclableCount = totalItems - recyclableCount;
 
     const recyclablePercentage = (recyclableCount / totalItems) * 100;
@@ -103,7 +136,7 @@ const App: React.FC = () => {
 
     return [
       { item: "Recyclable:  ", percentage: recyclablePercentage, fill: "var(--color-recyclable)" },
-      { item: "Non-Recyclable:  ", percentage: nonRecyclablePercentage, fill: "var(--color-nonRecyclable)" }
+      { item: "Non-Recyclable:  ", percentage: nonRecyclablePercentage, fill: "var(--color-nonRecyclable)" },
     ];
   }, [persistDetectionData]);
 
@@ -118,7 +151,9 @@ const App: React.FC = () => {
         <h1 className="text-xl font-extrabold leading-tight tracking-tighter md:text-2xl lg:text-3xl">
           Real-Time Trash Detection
         </h1>
-        <Button color="danger" onClick={() => setPersistDetectionData([])}>Empty Trash</Button>
+        <Button color="danger" onClick={() => setPersistDetectionData([])}>
+          Empty Trash
+        </Button>
       </div>
       <div className="flex flex-col gap-6 lg:flex-row">
         <div className="lg:w-3/5 xl:w-2/3">
@@ -130,9 +165,10 @@ const App: React.FC = () => {
           <PieChartCard chartData={chartData} />
           <BarChartCard chartData={persistDetectionData} chartConfig={chartConfig} />
         </div>
+        <Toaster position="top-center" richColors/>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
