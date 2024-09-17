@@ -1,7 +1,7 @@
 # Trashminator v2.0 🚮🤖
 
 <p align="center">
-    <img width="370" alt="Screenshot 2024-08-19 at 10 27 10 PM" src="https://github.com/user-attachments/assets/218879ac-a81d-4a35-aa86-39c71cbc2a2a">
+    <img width="600" alt="Screenshot 2024-08-19 at 10 27 10 PM" src="https://github.com/user-attachments/assets/80bccbc1-0d70-4289-acc6-423d6ab4d399">
 </p>
 
 **TRASHMINATOR** is an AI-powered solution designed to revolutionize waste management. It efficiently identifies, categorizes, and optimizes waste disposal processes to promote a cleaner and more sustainable environment. 🌍
