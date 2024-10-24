@@ -118,7 +118,8 @@ const detect = async (
     const score = scores_data[i]
     const className = labels[classes_data[i]]
 
-    if (score > 0.75) {
+    // Set detection threshold to 70%
+    if (score > 0.85) {
       filteredData[i] = [className, score]
       count[className] = (count[className] || 0) + 1
     }

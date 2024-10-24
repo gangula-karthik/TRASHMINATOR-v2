@@ -30,7 +30,7 @@ export const renderBoxes = (
 
   for (let i = 0; i < scores_data.length; ++i) {
     // filter based on class threshold
-    if (scores_data[i] < 0.6) continue; // Skip if score is less than 60%
+    if (scores_data[i] < 0.85) continue; // Skip if score is less than 60%
     const klass = labels[classes_data[i]]
     const color = colors.get(classes_data[i])
     const score = (scores_data[i] * 100).toFixed(1)

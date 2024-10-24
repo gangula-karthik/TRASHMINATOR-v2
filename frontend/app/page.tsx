@@ -34,35 +34,44 @@ interface ChartData {
   fill: string;
 }
 
+// const recyclableItems = [
+//   "Aluminium blister pack",
+//   "Aluminium foil",
+//   "Battery",
+//   "Clear plastic bottle",
+//   "Corrugated carton",
+//   "Drink can",
+//   "Drink carton",
+//   "Egg carton",
+//   "Food Can",
+//   "Glass bottle",
+//   "Glass jar",
+//   "Magazine paper",
+//   "Meal carton",
+//   "Metal bottle cap",
+//   "Metal lid",
+//   "Normal paper",
+//   "Other carton",
+//   "Other plastic bottle",
+//   "Paper bag",
+//   "Pizza box",
+//   "Plastic bottle cap",
+//   "Plastic lid",
+//   "Pop tab",
+//   "Scrap metal",
+//   "Spread tub",
+//   "Toilet tube",
+//   "Tupperware",
+// ];
+
 const recyclableItems = [
-  "Aluminium blister pack",
-  "Aluminium foil",
-  "Battery",
-  "Clear plastic bottle",
-  "Corrugated carton",
-  "Drink can",
-  "Drink carton",
-  "Egg carton",
-  "Food Can",
-  "Glass bottle",
-  "Glass jar",
-  "Magazine paper",
-  "Meal carton",
-  "Metal bottle cap",
-  "Metal lid",
-  "Normal paper",
-  "Other carton",
-  "Other plastic bottle",
-  "Paper bag",
-  "Pizza box",
-  "Plastic bottle cap",
-  "Plastic lid",
-  "Pop tab",
-  "Scrap metal",
-  "Spread tub",
-  "Toilet tube",
-  "Tupperware",
-];
+  "BIODEGRADABLE",
+  "CARDBOARD",
+  "GLASS",
+  "METAL",
+  "PAPER",
+  "PLASTIC"
+]
 
 const App: React.FC = () => {
   const [detectionData, setDetectionData] = useState<DetectionData | null>(null);
