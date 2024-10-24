@@ -5,7 +5,7 @@ import * as tf from "@tensorflow/tfjs"
 import "@tensorflow/tfjs-backend-webgl"
 import ButtonHandler from "@/components/btn-handler"
 import { Spinner } from "@nextui-org/spinner"
-import labels from "../datasets/taco/classes.json"
+import labels from "../datasets/best_web_model_v3/classes.json"
 import { renderBoxes } from "../utils/renderBox"
 
 const numClass = labels.length
@@ -118,8 +118,7 @@ const detect = async (
     const score = scores_data[i]
     const className = labels[classes_data[i]]
 
-    // Set detection threshold to 70%
-    if (score > 0.85) {
+    if (score > 0.8) {
       filteredData[i] = [className, score]
       count[className] = (count[className] || 0) + 1
     }
@@ -147,7 +146,7 @@ const App: React.FC<{ onDetectionData: (data: any) => void }> = ({ onDetectionDa
     setLoading(0)
     tf.ready().then(async () => {
       setLoading(50)
-      const yolov8 = await tf.loadGraphModel("/model/best_web_model/model.json")
+      const yolov8 = await tf.loadGraphModel("/model/best_web_model_v3/model.json")
       setLoading(75)
       const dummyInput = tf.ones(yolov8.inputs[0].shape as number[])
       const warmupResults = yolov8.execute(dummyInput)

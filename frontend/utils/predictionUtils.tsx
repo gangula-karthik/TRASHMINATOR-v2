@@ -1,6 +1,6 @@
 import * as tf from "@tensorflow/tfjs"
 
-import LABELS from "../datasets/taco/classes.json"
+import LABELS from "../datasets/best_web_model_v3/classes.json"
 
 export const preprocess = (
   source: HTMLVideoElement | HTMLImageElement,

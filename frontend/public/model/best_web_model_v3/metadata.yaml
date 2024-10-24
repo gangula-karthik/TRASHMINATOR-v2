@@ -1,0 +1,23 @@
+description: Ultralytics best model trained on /kaggle/working/yolov8-trash-detections-6/data.yaml
+author: Ultralytics
+date: '2024-10-24T14:51:55.462569'
+version: 8.2.2
+license: AGPL-3.0 License (https://ultralytics.com/license)
+docs: https://docs.ultralytics.com
+stride: 32
+task: detect
+batch: 1
+imgsz:
+- 640
+- 640
+names:
+  0: battery
+  1: can
+  2: cardboard
+  3: drink carton
+  4: glass bottle
+  5: paper
+  6: plastic bag
+  7: plastic bottle
+  8: plastic bottle cap
+  9: pop tab
