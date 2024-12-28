@@ -34,6 +34,7 @@ const BarChartCard: React.FC<BarChartCardProps> = ({ chartData, chartConfig }) =
           <BarChart accessibilityLayer data={chartData} margin={{
             top: 25,
           }}
+            layout="vertical"
           >
             <CartesianGrid vertical={false} />
             <XAxis
