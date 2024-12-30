@@ -76,7 +76,7 @@ export const PieChartCard: React.FC<{ chartData: ChartData[] }> = ({ chartData }
                           y={viewBox.cy}
                           className="fill-foreground text-3xl font-bold"
                         >
-                          {recyclablePercentage.toLocaleString()}
+                          {recyclablePercentage.toFixed(1)}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
