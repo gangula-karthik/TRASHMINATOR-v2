@@ -9,7 +9,6 @@ import {Button} from "@nextui-org/react";
 import { Toaster } from "@/components/ui/sonner"
 import { toast } from "sonner"
 
-
 const chartConfig: ChartConfig = {
   count: { label: "Count", color: "hsl(var(--chart-1))" },
 };
@@ -34,42 +33,11 @@ interface ChartData {
   fill: string;
 }
 
-// const recyclableItems = [
-//   "Aluminium blister pack",
-//   "Aluminium foil",
-//   "Battery",
-//   "Clear plastic bottle",
-//   "Corrugated carton",
-//   "Drink can",
-//   "Drink carton",
-//   "Egg carton",
-//   "Food Can",
-//   "Glass bottle",
-//   "Glass jar",
-//   "Magazine paper",
-//   "Meal carton",
-//   "Metal bottle cap",
-//   "Metal lid",
-//   "Normal paper",
-//   "Other carton",
-//   "Other plastic bottle",
-//   "Paper bag",
-//   "Pizza box",
-//   "Plastic bottle cap",
-//   "Plastic lid",
-//   "Pop tab",
-//   "Scrap metal",
-//   "Spread tub",
-//   "Toilet tube",
-//   "Tupperware",
-// ];
-
 const recyclableItems = [
   "cardboard",
   "drink carton",
   "glass bottle",
   "paper",
-  "plastic bag",
   "plastic bottle",
   "plastic bottle cap"
 ]
@@ -94,11 +62,11 @@ const App: React.FC = () => {
       })
       .map((key) => ({
         object: key,
-        count: 1, // Always count as 1 when detected
+        count: 1,
       }));
   
     setPersistDetectionData((prevData) => {
-      if (newData.length === 0) return prevData; // No changes if no new detections
+      if (newData.length === 0) return prevData;
   
       let updatedData = [...prevData];
   
@@ -106,13 +74,11 @@ const App: React.FC = () => {
         const prevItemIndex = updatedData.findIndex((item) => item.object === newItem.object);
   
         if (prevItemIndex !== -1) {
-          // Item exists, increment count
           updatedData[prevItemIndex] = {
             ...updatedData[prevItemIndex],
             count: updatedData[prevItemIndex].count + 1,
           };
         } else {
-          // New item, add to list
           updatedData.push(newItem);
         }
       });
@@ -120,9 +86,8 @@ const App: React.FC = () => {
       return updatedData;
     });
   
-    // Show toast for each new detection
     newData.forEach((newItem) => {
-      toast.success(`${newItem.object} has been detected.`); // Updated toast call to use a string
+      toast.success(`${newItem.object} has been detected.`);
     });
   };
   
@@ -156,28 +121,30 @@ const App: React.FC = () => {
   }, [persistDetectionData, chartData]);
 
   return (
-    <div className="App min-h-screen p-4 md:p-6 lg:p-8">
-      <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-xl font-extrabold leading-tight tracking-tighter md:text-2xl lg:text-3xl">
-          Real-Time Trash Detection
-        </h1>
-        <Button color="danger" onClick={() => setPersistDetectionData([])}>
-          Empty Trash
-        </Button>
-      </div>
-      <div className="flex flex-col gap-6 lg:flex-row">
-        <div className="lg:w-3/5 xl:w-2/3">
-          <div className="aspect-video w-full">
-            <VideoStream onDetectionData={handleDetectionData} />
+    <>
+      <div className="App min-h-screen p-4 md:p-6 lg:p-8">
+        <div className="mb-4 flex items-center justify-between">
+          <h1 className="text-xl font-extrabold leading-tight tracking-tighter md:text-2xl lg:text-3xl">
+            Real-Time Trash Detection
+          </h1>
+          <Button color="danger" onClick={() => setPersistDetectionData([])}>
+            Empty Trash
+          </Button>
+        </div>
+        <div className="flex flex-col gap-6 lg:flex-row">
+          <div className="lg:w-3/5 xl:w-2/3">
+            <div className="aspect-video w-full">
+              <VideoStream onDetectionData={handleDetectionData} />
+            </div>
+          </div>
+          <div className="flex flex-col gap-6 lg:w-2/5 xl:w-1/3">
+            <PieChartCard chartData={chartData} />
+            <BarChartCard chartData={persistDetectionData} chartConfig={chartConfig} />
           </div>
         </div>
-        <div className="flex flex-col gap-6 lg:w-2/5 xl:w-1/3">
-          <PieChartCard chartData={chartData} />
-          <BarChartCard chartData={persistDetectionData} chartConfig={chartConfig} />
-        </div>
-        <Toaster position="top-center" richColors/>
       </div>
-    </div>
+      <Toaster position="top-center" richColors />
+    </>
   );
 };
 
