@@ -8,6 +8,9 @@ import VideoStream from "@/components/VideoStream";
 import {Button} from "@nextui-org/react";
 import { Toaster } from "@/components/ui/sonner"
 import { toast } from "sonner"
+import { HiTrash } from "react-icons/hi2";
+
+
 
 const chartConfig: ChartConfig = {
   count: { label: "Count", color: "hsl(var(--chart-1))" },
@@ -98,8 +101,8 @@ const App: React.FC = () => {
   const chartData: ChartData[] = useMemo(() => {
     if (persistDetectionData.length === 0) {
       return [
-        { item: "Recyclable", percentage: 0, fill: "var(--color-recyclable)" },
-        { item: "Non-Recyclable", percentage: 0, fill: "var(--color-nonRecyclable)" },
+        { item: "Trash", percentage: 0, fill: "var(--color-recyclable)" },
+        { item: "Not Trash", percentage: 0, fill: "var(--color-nonRecyclable)" },
       ];
     }
 
@@ -114,8 +117,8 @@ const App: React.FC = () => {
     const nonRecyclablePercentage = (nonRecyclableCount / totalItems) * 100;
 
     return [
-      { item: "Recyclable:  ", percentage: recyclablePercentage, fill: "var(--color-recyclable)" },
-      { item: "Non-Recyclable:  ", percentage: nonRecyclablePercentage, fill: "var(--color-nonRecyclable)" },
+      { item: "Trash:  ", percentage: recyclablePercentage, fill: "var(--color-recyclable)" },
+      { item: "Not Trash:  ", percentage: nonRecyclablePercentage, fill: "var(--color-nonRecyclable)" },
     ];
   }, [persistDetectionData]);
 
@@ -124,6 +127,17 @@ const App: React.FC = () => {
     console.log(chartData);
   }, [persistDetectionData, chartData]);
 
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  const handleResize = () => {
+    setWindowWidth(window.innerWidth);
+  };
+
+  useEffect(() => {
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
     <>
       <div className="App min-h-screen p-4 md:p-6 lg:p-8">
@@ -131,8 +145,9 @@ const App: React.FC = () => {
           <h1 className="text-xl font-extrabold leading-tight tracking-tighter md:text-2xl lg:text-3xl">
             Real-Time Trash Detection
           </h1>
-          <Button color="danger" onClick={() => setPersistDetectionData([])}>
-            Empty Trash
+          <Button color="danger" variant="flat" onClick={() => setPersistDetectionData([])}>
+            <HiTrash className="text-xl" />
+            {windowWidth > 762 && <span>Clear Trash</span>}
           </Button>
         </div>
         <div className="flex flex-col gap-6 lg:flex-row">

@@ -1,6 +1,8 @@
 import React, { useState, useRef, RefObject } from "react";
 import { Webcam } from "@/utils/webcam";
+import { HiMiniVideoCamera, HiVideoCameraSlash } from "react-icons/hi2";
 import { Button } from "@nextui-org/react";
+
 
 interface ButtonHandlerProps {
   cameraRef: RefObject<HTMLVideoElement>;
@@ -31,10 +33,11 @@ const ButtonHandler: React.FC<ButtonHandlerProps> = ({ cameraRef }) => {
           }
         }}
         color="success"
-        variant="shadow"
+        variant="flat"
         fullWidth={true}
       >
-        {streaming === "camera" ? "Close" : "Open"} Webcam
+        {streaming === "camera" ? (<><HiVideoCameraSlash className="text-xl"/><span>Stop Camera</span></>) : (<><HiMiniVideoCamera className="text-xl"/><span>Start Camera</span></>)}
+
       </Button>
     </div>
   );

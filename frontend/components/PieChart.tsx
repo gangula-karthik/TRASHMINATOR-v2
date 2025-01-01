@@ -25,24 +25,24 @@ const chartConfig = {
       label: "Percentage",
     },
     recyclable: {
-      label: "Recyclable",
+      label: "Trash",
       color: "hsl(var(--chart-3))",
     },
     nonRecyclable: {
-      label: "Non-Recyclable",
+      label: "Not Trash",
       color: "hsl(var(--chart-1))",
     }
   } satisfies ChartConfig
 
 export const PieChartCard: React.FC<{ chartData: ChartData[] }> = ({ chartData }) => {
   const recyclablePercentage = React.useMemo(() => {
-    return chartData.find(data => data.item === "Recyclable:  ")?.percentage || 0;
+    return chartData.find(data => data.item === "Trash:  ")?.percentage || 0;
   }, [chartData])
 
   return (
     <Card className="flex flex-col">
-      <CardHeader className="items-center pb-0">
-        <CardTitle>Percentage of Recyclable Items</CardTitle>
+      <CardHeader className="pb-0">
+        <CardTitle className="font-sans text-xl font-semibold subpixel-antialiased">Percentage of Trash Found</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer
@@ -83,7 +83,7 @@ export const PieChartCard: React.FC<{ chartData: ChartData[] }> = ({ chartData }
                           y={(viewBox.cy || 0) + 24}
                           className="fill-muted-foreground"
                         >
-                          % Recyclable
+                          % Trash Found
                         </tspan>
                       </text>
                     )

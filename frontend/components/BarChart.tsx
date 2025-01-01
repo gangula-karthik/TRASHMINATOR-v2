@@ -82,8 +82,8 @@ const processedData = chartData
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Items in Trash</CardTitle>
+      <CardHeader className="pb-0">
+        <CardTitle className="font-sans text-xl font-semibold subpixel-antialiased">Items in Trash</CardTitle>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
