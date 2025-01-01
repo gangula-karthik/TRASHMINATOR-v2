@@ -34,12 +34,16 @@ interface ChartData {
 }
 
 const recyclableItems = [
+  "battery",
+  "can",
   "cardboard",
   "drink carton",
   "glass bottle",
   "paper",
+  "plastic bag",
   "plastic bottle",
-  "plastic bottle cap"
+  "plastic bottle cap",
+  "pop tab"
 ]
 
 const App: React.FC = () => {

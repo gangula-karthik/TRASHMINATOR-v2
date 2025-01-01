@@ -1,0 +1,28 @@
+description: Ultralytics best model trained on /kaggle/working/final_dataset/data.yaml
+author: Ultralytics
+date: '2025-01-01T13:29:30.984762'
+version: 8.2.2
+license: AGPL-3.0 License (https://ultralytics.com/license)
+docs: https://docs.ultralytics.com
+stride: 32
+task: detect
+batch: 1
+imgsz:
+- 640
+- 640
+names:
+  0: battery
+  1: can
+  2: cardboard
+  3: drink carton
+  4: glass bottle
+  5: paper
+  6: plastic bag
+  7: plastic bottle
+  8: plastic bottle cap
+  9: pop tab
+  10: glasses
+  11: cell-phone
+  12: bag
+  13: watch
+  14: wallet

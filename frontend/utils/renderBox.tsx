@@ -1,4 +1,4 @@
-import labels from "../datasets/best_web_model_v3/classes.json"
+import labels from "../datasets/best_web_model_v4/classes.json"
 
 /**
  * Render prediction boxes
